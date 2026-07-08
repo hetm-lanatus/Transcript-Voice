@@ -5,6 +5,7 @@ export function useAssemblyAI() {
   const [isPaused, setIsPaused] = useState(false);
   const [finalTranscript, setFinalTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [isTranscribingFile, setIsTranscribingFile] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
 
@@ -32,7 +33,7 @@ export function useAssemblyAI() {
     if (connectionRef.current) {
       // Send a close message to AssemblyAI to signify end of stream (v3 API)
       if (connectionRef.current.readyState === WebSocket.OPEN) {
-        connectionRef.current.send(JSON.stringify({ type: 'Terminate' }));
+        connectionRef.current.send(JSON.stringify({ terminate_session: true }));
       }
       connectionRef.current.close();
       connectionRef.current = null;
@@ -45,18 +46,21 @@ export function useAssemblyAI() {
   }, []);
 
   const startRecording = useCallback(async () => {
-    if (!apiKey) {
-      setError('AssemblyAI API key is missing. Add VITE_ASSEMBLYAI_API_KEY to .env.local.');
-      return;
-    }
-
     try {
-      setError(null);
       setConnectionState('connecting');
+      setError(null);
       setFinalTranscript('');
       setInterimTranscript('');
 
-      // 1. Get Audio Stream
+      // 1. Fetch token
+      const response = await fetch('/api/assemblyai-token');
+      const data = await response.json();
+      
+      if (!data.token) {
+        throw new Error('Failed to get AssemblyAI token');
+      }
+
+      // 2. Get Audio Stream
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
@@ -158,6 +162,78 @@ export function useAssemblyAI() {
     }
   }, [apiKey, stopRecording, connectionState, isPaused]);
 
+  const transcribeFile = useCallback(async (file: File) => {
+    if (!apiKey) {
+      setError('AssemblyAI API key is missing.');
+      return;
+    }
+
+    try {
+      setIsTranscribingFile(true);
+      setError(null);
+      setFinalTranscript('');
+      setInterimTranscript('Uploading file...');
+
+      // 1. Upload the file
+      const uploadResponse = await fetch('https://api.assemblyai.com/v2/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': apiKey,
+          'Content-Type': 'application/octet-stream'
+        },
+        body: file
+      });
+      const uploadData = await uploadResponse.json();
+
+      if (!uploadData.upload_url) {
+        throw new Error('Upload failed');
+      }
+
+      setInterimTranscript('Transcribing... please wait...');
+
+      // 2. Start transcription
+      const transcriptResponse = await fetch('https://api.assemblyai.com/v2/transcript', {
+        method: 'POST',
+        headers: {
+          'Authorization': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ audio_url: uploadData.upload_url })
+      });
+      const transcriptData = await transcriptResponse.json();
+
+      if (!transcriptData.id) {
+        throw new Error('Failed to start transcription');
+      }
+
+      // 3. Poll for completion
+      const poll = async () => {
+        const pollResponse = await fetch(`https://api.assemblyai.com/v2/transcript/${transcriptData.id}`, {
+          headers: { 'Authorization': apiKey }
+        });
+        const pollData = await pollResponse.json();
+
+        if (pollData.status === 'completed') {
+          setFinalTranscript(pollData.text);
+          setInterimTranscript('');
+          setIsTranscribingFile(false);
+        } else if (pollData.status === 'error') {
+          throw new Error(pollData.error || 'Transcription failed');
+        } else {
+          setTimeout(poll, 3000);
+        }
+      };
+      
+      poll();
+
+    } catch (e: any) {
+      console.error('AssemblyAI file transcription error:', e);
+      setError(`Failed to transcribe file: ${e.message}`);
+      setIsTranscribingFile(false);
+      setInterimTranscript('');
+    }
+  }, [apiKey]);
+
   const toggleRecording = useCallback(() => {
     if (isRecording) {
       stopRecording();
@@ -181,6 +257,7 @@ export function useAssemblyAI() {
   return {
     isRecording,
     isPaused,
+    isTranscribingFile,
     finalTranscript,
     interimTranscript,
     error,
@@ -188,6 +265,7 @@ export function useAssemblyAI() {
     startRecording,
     stopRecording,
     toggleRecording,
+    transcribeFile,
     clearTranscript,
   };
 }

@@ -5,6 +5,7 @@ export function useDeepgram() {
   const [isPaused, setIsPaused] = useState(false);
   const [finalTranscript, setFinalTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [isTranscribingFile, setIsTranscribingFile] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
 
@@ -50,7 +51,7 @@ export function useDeepgram() {
       streamRef.current = stream;
 
       // 2. Initialize Deepgram Native WebSocket Connection
-      const wsUrl = 'wss://api.deepgram.com/v1/listen?model=nova-2&interim_results=true&smart_format=true';
+      const wsUrl = 'wss://api.deepgram.com/v1/listen?model=nova-3&interim_results=true&smart_format=true';
       const connection = new WebSocket(wsUrl, ['token', apiKey]);
       connectionRef.current = connection;
 
@@ -112,6 +113,43 @@ export function useDeepgram() {
     }
   }, [apiKey, stopRecording, connectionState]);
 
+  const transcribeFile = useCallback(async (file: File) => {
+    if (!apiKey) {
+      setError('Deepgram API key is missing.');
+      return;
+    }
+
+    try {
+      setIsTranscribingFile(true);
+      setError(null);
+      setFinalTranscript('');
+      setInterimTranscript('');
+
+      const response = await fetch('https://api.deepgram.com/v1/listen?smart_format=true&model=nova-3', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${apiKey}`,
+          'Content-Type': file.type || 'audio/wav',
+        },
+        body: file,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const transcript = data.results?.channels[0]?.alternatives[0]?.transcript || '';
+      setFinalTranscript(transcript);
+
+    } catch (e: any) {
+      console.error('Deepgram File Transcription Error:', e);
+      setError(`Failed to transcribe file: ${e.message}`);
+    } finally {
+      setIsTranscribingFile(false);
+    }
+  }, [apiKey]);
+
   const toggleRecording = useCallback(() => {
     if (isRecording) {
       stopRecording();
@@ -135,6 +173,7 @@ export function useDeepgram() {
   return {
     isRecording,
     isPaused,
+    isTranscribingFile,
     finalTranscript,
     interimTranscript,
     error,
@@ -142,6 +181,7 @@ export function useDeepgram() {
     startRecording,
     stopRecording,
     toggleRecording,
+    transcribeFile,
     clearTranscript,
   };
 }

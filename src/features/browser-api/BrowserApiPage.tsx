@@ -94,6 +94,7 @@ export default function BrowserApiPage() {
       <ImplementationGuide>
         <Typography variant="h6" gutterBottom>Implementation Details</Typography>
         <Typography variant="body1" paragraph><strong>Model Used:</strong> Built-in browser speech recognition engine (e.g., Google's engine on Chrome, Apple's on Safari).</Typography>
+        <Typography variant="body1" paragraph><strong>Pricing:</strong> 100% Free.</Typography>
         <Typography variant="body1" paragraph><strong>Approach:</strong> Utilizes the native <code>window.SpeechRecognition</code> or <code>window.webkitSpeechRecognition</code> Web Speech API. It runs entirely on the client side without needing any external API keys, SDKs, or backend services.</Typography>
         <Typography variant="body1" paragraph><strong>Features & Capabilities:</strong></Typography>
         <ul>

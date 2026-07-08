@@ -3,7 +3,6 @@ import MainLayout from './layouts/MainLayout';
 import BrowserApiPage from './features/browser-api/BrowserApiPage';
 import DeepgramPage from './features/deepgram/DeepgramPage';
 import WhisperPage from './features/whisper/WhisperPage';
-import FasterWhisperPage from './features/faster-whisper/FasterWhisperPage';
 import GroqPage from './features/groq/GroqPage';
 import AssemblyaiPage from './features/assemblyai/AssemblyaiPage';
 import SpeechmaticsPage from './features/speechmatics/SpeechmaticsPage';
@@ -18,7 +17,6 @@ function App() {
         <Route path="browser-api" element={<BrowserApiPage />} />
         <Route path="deepgram" element={<DeepgramPage />} />
         <Route path="whisper" element={<WhisperPage />} />
-        <Route path="faster-whisper" element={<FasterWhisperPage />} />
         <Route path="groq" element={<GroqPage />} />
         <Route path="assemblyai" element={<AssemblyaiPage />} />
         <Route path="speechmatics" element={<SpeechmaticsPage />} />

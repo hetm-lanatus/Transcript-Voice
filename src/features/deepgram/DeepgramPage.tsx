@@ -1,22 +1,37 @@
-import { Box, Typography, Alert, Chip, CircularProgress } from '@mui/material';
+import { Box, Typography, Alert, Chip, CircularProgress, Button, Divider } from '@mui/material';
+import { useRef } from 'react';
 import { useDeepgram } from './useDeepgram';
 import MicrophoneButton from '../../shared/components/MicrophoneButton';
 import TranscriptViewer from '../../shared/components/TranscriptViewer';
 import RecordingControls from '../../shared/components/RecordingControls';
 import ImplementationGuide from '../../shared/components/ImplementationGuide';
 import CloudIcon from '@mui/icons-material/Cloud';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 export default function DeepgramPage() {
   const {
     isRecording,
     isPaused,
+    isTranscribingFile,
     finalTranscript,
     interimTranscript,
     error,
     connectionState,
     toggleRecording,
+    transcribeFile,
     clearTranscript
   } = useDeepgram();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    transcribeFile(file);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleDownloadTxt = () => {
     const element = document.createElement("a");
@@ -58,7 +73,7 @@ export default function DeepgramPage() {
         <Box>
           <Typography variant="h4" fontWeight="bold">Deepgram</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Real-time streaming via WebSocket using Nova-2 model.
+            Real-time streaming via WebSocket using Nova-3 model.
           </Typography>
         </Box>
         <Box>
@@ -76,14 +91,43 @@ export default function DeepgramPage() {
 
       {/* Main Interaction Area */}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', my: 4, gap: 2 }}>
-        <MicrophoneButton 
-          isRecording={isRecording} 
-          onToggle={toggleRecording} 
-          disabled={connectionState === 'connecting'}
-        />
-        <Typography variant="caption" color="text.secondary">
-          {connectionState === 'connecting' ? 'Connecting to Deepgram...' : (isRecording ? 'Listening...' : 'Click to start')}
-        </Typography>
+        <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <MicrophoneButton 
+              isRecording={isRecording} 
+              onToggle={toggleRecording} 
+              disabled={connectionState === 'connecting' || isTranscribingFile}
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+              {connectionState === 'connecting' ? 'Connecting...' : (isRecording ? 'Listening...' : 'Microphone')}
+            </Typography>
+          </Box>
+          
+          <Divider orientation="vertical" flexItem />
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <input 
+              type="file" 
+              accept="audio/*" 
+              style={{ display: 'none' }} 
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+            />
+            <Button 
+              variant="outlined" 
+              color="primary"
+              startIcon={isTranscribingFile ? <CircularProgress size={20} /> : <UploadFileIcon />}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isRecording || isTranscribingFile}
+              sx={{ height: 64, width: 180, borderRadius: 2 }}
+            >
+              {isTranscribingFile ? 'Transcribing...' : 'Upload File'}
+            </Button>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+              Static File Transcription
+            </Typography>
+          </Box>
+        </Box>
 
         <RecordingControls 
           isRecording={isRecording}
@@ -107,6 +151,8 @@ export default function DeepgramPage() {
       <ImplementationGuide>
         <Typography variant="h6" gutterBottom>Implementation Details</Typography>
         <Typography variant="body1" paragraph><strong>Model Used:</strong> <code>nova-2</code> (Deepgram's fastest and most accurate model).</Typography>
+        <Typography variant="body1" paragraph><strong>Pricing:</strong> Approximately $0.35 per hour for the Nova-2 streaming model.</Typography>
+        <Typography variant="body1" paragraph><strong>Pricing:</strong> Approximately $0.29 per hour for the Nova-3 streaming model.</Typography>
         <Typography variant="body1" paragraph><strong>Approach:</strong> Establishes a native WebSocket connection to <code>wss://api.deepgram.com/v1/listen</code> for real-time streaming audio transcription. The browser captures audio using <code>MediaRecorder</code>, chunks it into 250ms <code>audio/webm</code> blobs, and streams it directly to the Deepgram server. Deepgram responds asynchronously via WebSocket messages with interim and final JSON transcripts.</Typography>
         <Typography variant="body1" paragraph><strong>Features & Capabilities:</strong></Typography>
         <ul>

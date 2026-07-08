@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -21,14 +21,14 @@ import CloudIcon from '@mui/icons-material/Cloud';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SettingsVoiceIcon from '@mui/icons-material/SettingsVoice';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-const drawerWidth = 260;
+const drawerWidth = 280;
 
 const NAVIGATION = [
   { id: 'browser-api', label: 'Browser API', icon: <MicIcon /> },
   { id: 'deepgram', label: 'Deepgram', icon: <CloudIcon /> },
-  { id: 'whisper', label: 'Whisper', icon: <SmartToyIcon /> },
-  { id: 'faster-whisper', label: 'Faster Whisper', icon: <SmartToyIcon /> },
+  { id: 'whisper', label: <>Whisper <span style={{ color: "red" }}>*</span></>, icon: <SmartToyIcon /> },
   { id: 'groq', label: 'Groq Whisper', icon: <CloudIcon /> },
   { id: 'assemblyai', label: 'AssemblyAI', icon: <SettingsVoiceIcon /> },
   { id: 'speechmatics', label: 'Speechmatics', icon: <SettingsVoiceIcon /> },
@@ -45,62 +45,72 @@ export default function MainLayout() {
     setMobileOpen(!mobileOpen);
   };
 
-  const handleNavigation = (id: string) => {
-    navigate(`/${id}`);
-    if (mobileOpen) setMobileOpen(false);
-  };
-
-  const currentPath = location.pathname.substring(1);
-
   const drawer = (
-    <div>
-      <Toolbar>
-        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Toolbar sx={{ my: 2, justifyContent: 'center' }}>
+        <Typography variant="h5" noWrap component="div" sx={{ fontWeight: 'bold' }}>
           STT Playground
         </Typography>
       </Toolbar>
-      <Divider />
-      <List>
-        {NAVIGATION.map((item) => (
-          <ListItem key={item.id} disablePadding>
-            <ListItemButton
-              selected={currentPath === item.id}
-              onClick={() => handleNavigation(item.id)}
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: 'primary.dark',
-                  color: 'primary.contrastText',
-                  '& .MuiListItemIcon-root': {
-                    color: 'primary.contrastText',
-                  }
-                },
-                borderRadius: '0 24px 24px 0',
-                mr: 2,
-                mb: 0.5,
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 40 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+      <Divider sx={{ mb: 2, borderColor: 'rgba(255,255,255,0.1)' }} />
+      <List sx={{ px: 2, flexGrow: 1 }}>
+        {NAVIGATION.map((item) => {
+          const isActive = location.pathname.includes(item.id);
+          
+          return (
+            <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                selected={isActive}
+                onClick={() => {
+                  navigate(`/${item.id}`);
+                  setMobileOpen(false);
+                }}
+                sx={{
+                  borderRadius: 1,
+                  bgcolor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                  border: isActive ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.08)',
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ 
+                  color: isActive ? '#fff' : 'text.secondary',
+                  minWidth: 40,
+                }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.label} 
+                  primaryTypographyProps={{ 
+                    fontWeight: isActive ? 500 : 400,
+                    color: isActive ? '#fff' : 'text.secondary',
+                  }} 
+                />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
-    </div>
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+          ADVANCED AGENTIC CODING
+        </Typography>
+      </Box>
+    </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#000' }}>
       <CssBaseline />
       <AppBar
         position="fixed"
+        elevation={0}
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          bgcolor: 'background.paper',
-          color: 'text.primary',
-          boxShadow: 1,
+          bgcolor: '#000',
+          borderBottom: '1px solid rgba(255,255,255,0.1)'
         }}
       >
         <Toolbar>
@@ -113,9 +123,6 @@ export default function MainLayout() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {NAVIGATION.find((n) => n.id === currentPath)?.label || 'Playground'}
-          </Typography>
         </Toolbar>
       </AppBar>
       <Box
@@ -123,13 +130,12 @@ export default function MainLayout() {
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         aria-label="mailbox folders"
       >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true, 
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
@@ -142,7 +148,7 @@ export default function MainLayout() {
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, borderRight: '1px solid rgba(255, 255, 255, 0.12)' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
           open
         >
@@ -151,9 +157,13 @@ export default function MainLayout() {
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
+        sx={{ 
+          flexGrow: 1, 
+          p: { xs: 2, md: 4 }, 
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          mt: 8
+        }}
       >
-        <Toolbar />
         <Outlet />
       </Box>
     </Box>

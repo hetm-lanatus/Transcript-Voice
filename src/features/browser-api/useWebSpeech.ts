@@ -48,17 +48,15 @@ export function useWebSpeech(options: UseWebSpeechOptions = {}) {
       let interim = '';
       let final = '';
 
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
+      for (let i = 0; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          final += event.results[i][0].transcript;
+          final += event.results[i][0].transcript + ' ';
         } else {
           interim += event.results[i][0].transcript;
         }
       }
 
-      if (final) {
-        setFinalTranscript((prev) => prev + final + ' ');
-      }
+      setFinalTranscript(final);
       setInterimTranscript(interim);
     };
 

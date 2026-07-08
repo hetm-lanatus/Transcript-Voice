@@ -1,22 +1,37 @@
-import { Box, Typography, Alert, Chip, CircularProgress } from '@mui/material';
+import { Box, Typography, Alert, Chip, CircularProgress, Button, Divider } from '@mui/material';
+import { useRef } from 'react';
 import { useGroq } from './useGroq';
 import MicrophoneButton from '../../shared/components/MicrophoneButton';
 import TranscriptViewer from '../../shared/components/TranscriptViewer';
 import RecordingControls from '../../shared/components/RecordingControls';
 import ImplementationGuide from '../../shared/components/ImplementationGuide';
 import CloudIcon from '@mui/icons-material/Cloud';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 export default function GroqPage() {
   const {
     isRecording,
     isPaused,
+    isTranscribingFile,
     finalTranscript,
     interimTranscript,
     error,
     connectionState,
     toggleRecording,
+    transcribeFile,
     resetTranscript,
   } = useGroq();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    transcribeFile(file);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleDownloadTxt = () => {
     const element = document.createElement("a");
@@ -70,14 +85,43 @@ export default function GroqPage() {
 
       {/* Main Interaction Area */}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', my: 4, gap: 2 }}>
-        <MicrophoneButton 
-          isRecording={isRecording} 
-          onToggle={toggleRecording} 
-          disabled={connectionState === 'connecting'}
-        />
-        <Typography variant="caption" color="text.secondary">
-          {connectionState === 'connecting' ? 'Connecting to Groq...' : (isRecording ? 'Listening...' : 'Click to start')}
-        </Typography>
+        <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <MicrophoneButton 
+              isRecording={isRecording} 
+              onToggle={toggleRecording} 
+              disabled={connectionState === 'connecting' || isTranscribingFile}
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+              {connectionState === 'connecting' ? 'Connecting...' : (isRecording ? 'Listening...' : 'Microphone')}
+            </Typography>
+          </Box>
+          
+          <Divider orientation="vertical" flexItem />
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <input 
+              type="file" 
+              accept="audio/*" 
+              style={{ display: 'none' }} 
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+            />
+            <Button 
+              variant="outlined" 
+              color="primary"
+              startIcon={isTranscribingFile ? <CircularProgress size={20} /> : <UploadFileIcon />}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isRecording || isTranscribingFile}
+              sx={{ height: 64, width: 180, borderRadius: 2 }}
+            >
+              {isTranscribingFile ? 'Transcribing...' : 'Upload File'}
+            </Button>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+              Static File Transcription
+            </Typography>
+          </Box>
+        </Box>
 
         <RecordingControls 
           isRecording={isRecording}
@@ -101,6 +145,7 @@ export default function GroqPage() {
       <ImplementationGuide>
         <Typography variant="h6" gutterBottom>Implementation Details</Typography>
         <Typography variant="body1" paragraph><strong>Model Used:</strong> <code>whisper-large-v3</code> (OpenAI's Whisper model running on Groq's high-speed LPU inference engine).</Typography>
+        <Typography variant="body1" paragraph><strong>Pricing:</strong> Extremely cost-effective at $0.111 per hour (approx. $0.00185 per minute) for the Large v3 model.</Typography>
         <Typography variant="body1" paragraph><strong>Approach:</strong> Uses a chunked HTTP POST approach rather than WebSockets. The <code>MediaRecorder</code> API slices the user's microphone audio into 2-second chunks. Each chunk is sent as a <code>multipart/form-data</code> upload to Groq's API endpoint (via a Vite proxy to hide the API key). The response is then parsed to update the transcript.</Typography>
         <Typography variant="body1" paragraph><strong>Features & Capabilities:</strong></Typography>
         <ul>

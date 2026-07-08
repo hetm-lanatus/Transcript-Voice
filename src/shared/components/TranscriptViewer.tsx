@@ -30,30 +30,35 @@ export default function TranscriptViewer({
 
   return (
     <Paper
-      elevation={2}
+      elevation={0}
       sx={{
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         minHeight: 300,
         maxHeight: 500,
-        bgcolor: 'background.default',
-        border: '1px solid',
-        borderColor: 'divider',
+        bgcolor: '#111',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
       }}
     >
-      <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end', borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+      <Box sx={{ 
+        p: 1, 
+        display: 'flex', 
+        justifyContent: 'flex-end', 
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)', 
+        bgcolor: '#0a0a0a' 
+      }}>
         <Stack direction="row" spacing={1}>
           <Tooltip title="Copy Transcript">
-            <IconButton size="small" onClick={handleCopy} disabled={!finalTranscript}>
+            <IconButton size="small" onClick={handleCopy} disabled={!finalTranscript} sx={{ color: 'text.secondary' }}>
               <ContentCopyIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           {onClear && (
             <Tooltip title="Clear Transcript">
-              <IconButton size="small" onClick={onClear} color="error" disabled={!finalTranscript && !interimTranscript}>
+              <IconButton size="small" onClick={onClear} disabled={!finalTranscript && !interimTranscript} sx={{ color: 'text.secondary' }}>
                 <DeleteSweepIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -64,25 +69,27 @@ export default function TranscriptViewer({
       <Box
         ref={scrollRef}
         sx={{
-          p: 2,
           flexGrow: 1,
+          p: 3,
           overflowY: 'auto',
           scrollBehavior: 'smooth',
-          fontSize: '1.1rem',
+          fontSize: '1rem',
           lineHeight: 1.6,
+          color: 'text.primary',
         }}
       >
-        <Typography variant="body1" component="span" sx={{ color: 'text.primary' }}>
-          {finalTranscript}
-        </Typography>
-        {finalTranscript && interimTranscript && ' '}
-        <Typography variant="body1" component="span" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
-          {interimTranscript}
-        </Typography>
-
-        {!finalTranscript && !interimTranscript && (
-          <Typography variant="body1" sx={{ color: 'text.disabled', textAlign: 'center', mt: 4 }}>
-            Waiting for speech...
+        {(!finalTranscript && !interimTranscript) ? (
+          <Box sx={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography color="text.disabled" sx={{ fontStyle: 'italic' }}>
+              Waiting for speech...
+            </Typography>
+          </Box>
+        ) : (
+          <Typography component="div" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontWeight: 400 }}>
+            <span style={{ color: '#E0E0E0' }}>{finalTranscript}</span>
+            <span style={{ color: '#777', fontStyle: 'italic' }}>
+              {interimTranscript && (finalTranscript ? ' ' : '') + interimTranscript}
+            </span>
           </Typography>
         )}
       </Box>

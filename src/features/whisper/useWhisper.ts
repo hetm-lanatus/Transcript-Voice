@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 
-export function useGroq() {
+export function useWhisper() {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [finalTranscript, setFinalTranscript] = useState('');
@@ -57,39 +57,48 @@ export function useGroq() {
           
           fetchSequence += 1;
           const currentFetchSequence = fetchSequence;
-
+          
           // Combine all chunks so the WebM header is always present
           const audioBlob = new Blob(chunks, { type: 'audio/webm' });
 
           const formData = new FormData();
           formData.append('file', audioBlob, 'chunk.webm');
-          formData.append('model', 'whisper-large-v3');
+          formData.append('model', 'whisper-1');
           formData.append('response_format', 'json');
-          formData.append('language', 'en');
+          formData.append('language', 'en'); // Optional, to force English
 
           try {
-            const response = await fetch('/api/groq/audio/transcriptions', {
+            const response = await fetch('/api/openai/audio/transcriptions', {
               method: 'POST',
               body: formData,
             });
             const data = await response.json();
             
-            // Only update if this fetch belongs to the active recording and is the most recent in sequence
             if (recordingIdRef.current === currentRecordingId && currentFetchSequence > lastSuccessfulFetchSequenceRef.current) {
               if (response.ok && data.text) {
                 lastSuccessfulFetchSequenceRef.current = currentFetchSequence;
+                // Overwrite the entire transcript instead of appending for chunked approach
                 setFinalTranscript(data.text.trim());
               } else if (!response.ok) {
-                console.error('Groq API Error:', data.error || data);
+                const errorMessage = data.error?.message || 'Unknown OpenAI API Error';
+                console.error('OpenAI API Error:', data.error || data);
+                setError(`OpenAI Error: ${errorMessage}`);
+                setConnectionState('error');
+                stopRecording();
               }
             }
-          } catch (err) {
-            console.error('Groq transcription error:', err);
+          } catch (err: any) {
+            if (recordingIdRef.current === currentRecordingId) {
+              console.error('OpenAI transcription error:', err);
+              setError(`Network Error: ${err.message}`);
+              setConnectionState('error');
+              stopRecording();
+            }
           }
         }
       };
 
-      // Slice every 2 seconds for a responsive feel
+      // Slice every 2 seconds for a responsive feel, although OpenAI is slower than Groq
       mediaRecorder.start(2000);  
 
       setIsRecording(true);
@@ -123,11 +132,11 @@ export function useGroq() {
 
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('model', 'whisper-large-v3-turbo');
+      formData.append('model', 'whisper-1');
       formData.append('response_format', 'json');
       formData.append('language', 'en');
 
-      const response = await fetch('/api/groq/audio/transcriptions', {
+      const response = await fetch('/api/openai/audio/transcriptions', {
         method: 'POST',
         body: formData,
       });
@@ -136,11 +145,11 @@ export function useGroq() {
       if (response.ok && data.text) {
         setFinalTranscript(data.text.trim());
       } else {
-        const errorMessage = data.error?.message || 'Unknown Groq API Error';
+        const errorMessage = data.error?.message || 'Unknown OpenAI API Error';
         throw new Error(errorMessage);
       }
     } catch (err: any) {
-      console.error('Groq file transcription error:', err);
+      console.error('Whisper file transcription error:', err);
       setError(`Failed to transcribe file: ${err.message}`);
     } finally {
       setIsTranscribingFile(false);
