@@ -28,12 +28,6 @@ const drawerWidth = 280;
 const NAVIGATION = [
   { id: 'browser-api', label: 'Browser API', icon: <MicIcon /> },
   { id: 'deepgram', label: 'Deepgram', icon: <CloudIcon /> },
-  { id: 'whisper', label: <>Whisper <span style={{ color: "red" }}>*</span></>, icon: <SmartToyIcon /> },
-  { id: 'groq', label: 'Groq Whisper', icon: <CloudIcon /> },
-  { id: 'assemblyai', label: 'AssemblyAI', icon: <SettingsVoiceIcon /> },
-  { id: 'speechmatics', label: 'Speechmatics', icon: <SettingsVoiceIcon /> },
-  { id: 'gladia', label: 'Gladia', icon: <SettingsVoiceIcon /> },
-  { id: 'comparison', label: 'Comparison', icon: <DashboardIcon /> },
 ];
 
 export default function MainLayout() {

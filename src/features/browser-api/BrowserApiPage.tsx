@@ -91,21 +91,11 @@ export default function BrowserApiPage() {
       </Box>
 
       {/* Documentation Panel */}
-      <ImplementationGuide>
-        <Typography variant="h6" gutterBottom>Implementation Details</Typography>
-        <Typography variant="body1" paragraph><strong>Model Used:</strong> Built-in browser speech recognition engine (e.g., Google's engine on Chrome, Apple's on Safari).</Typography>
+      <ImplementationGuide title="Browser Native Business Overview">
         <Typography variant="body1" paragraph><strong>Pricing:</strong> 100% Free.</Typography>
-        <Typography variant="body1" paragraph><strong>Approach:</strong> Utilizes the native <code>window.SpeechRecognition</code> or <code>window.webkitSpeechRecognition</code> Web Speech API. It runs entirely on the client side without needing any external API keys, SDKs, or backend services.</Typography>
-        <Typography variant="body1" paragraph><strong>Features & Capabilities:</strong></Typography>
-        <ul>
-          <li>Supports <code>continuous</code> listening mode and provides <code>interimResults</code> for real-time feedback.</li>
-          <li>Requires zero dependencies and is completely free to use.</li>
-        </ul>
-        <Typography variant="body1" paragraph><strong>Pros & Cons:</strong></Typography>
-        <ul>
-          <li><strong>Pros:</strong> No API key needed, completely free, built directly into the browser, simple to implement.</li>
-          <li><strong>Cons:</strong> Inconsistent support across browsers (e.g., experimental/disabled in Firefox), privacy concerns (audio might be sent to Google/Apple without strict guarantees), varying accuracy depending on OS/Browser, and no advanced features like speaker diarization.</li>
-        </ul>
+        <Typography variant="body1" paragraph><strong>Free Tier:</strong> Unlimited usage, as it relies on the user's operating system or browser engine.</Typography>
+        <Typography variant="body1" paragraph><strong>Key Benefits for Clients:</strong> Requires zero backend infrastructure, no API keys, and no monthly bills. It simply leverages the voice recognition capabilities already built into Google Chrome or Apple Safari.</Typography>
+        <Typography variant="body1" paragraph><strong>Best Used For:</strong> Hobby projects, simple voice command interfaces where budget is zero, or internal tools where browser standardization (e.g., forcing everyone to use Chrome) is possible.</Typography>
       </ImplementationGuide>
     </Box>
   );

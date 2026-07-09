@@ -148,22 +148,11 @@ export default function DeepgramPage() {
       </Box>
 
       {/* Documentation Panel */}
-      <ImplementationGuide>
-        <Typography variant="h6" gutterBottom>Implementation Details</Typography>
-        <Typography variant="body1" paragraph><strong>Model Used:</strong> <code>nova-2</code> (Deepgram's fastest and most accurate model).</Typography>
-        <Typography variant="body1" paragraph><strong>Pricing:</strong> Approximately $0.35 per hour for the Nova-2 streaming model.</Typography>
-        <Typography variant="body1" paragraph><strong>Pricing:</strong> Approximately $0.29 per hour for the Nova-3 streaming model.</Typography>
-        <Typography variant="body1" paragraph><strong>Approach:</strong> Establishes a native WebSocket connection to <code>wss://api.deepgram.com/v1/listen</code> for real-time streaming audio transcription. The browser captures audio using <code>MediaRecorder</code>, chunks it into 250ms <code>audio/webm</code> blobs, and streams it directly to the Deepgram server. Deepgram responds asynchronously via WebSocket messages with interim and final JSON transcripts.</Typography>
-        <Typography variant="body1" paragraph><strong>Features & Capabilities:</strong></Typography>
-        <ul>
-          <li>Highly responsive with low latency (typically ~300ms).</li>
-          <li>Provides robust interim results (<code>interim_results=true</code>) and automatic smart formatting/punctuation (<code>smart_format=true</code>).</li>
-        </ul>
-        <Typography variant="body1" paragraph><strong>Pros & Cons:</strong></Typography>
-        <ul>
-          <li><strong>Pros:</strong> Extremely fast latency, highly accurate (Nova-2 model), robust punctuation, supports many languages, easily identifiable interim vs final results.</li>
-          <li><strong>Cons:</strong> Requires a paid API key. In a production app, securely managing the API key requires setting up backend token generation or proxying the WebSocket, as exposing it client-side is insecure.</li>
-        </ul>
+      <ImplementationGuide title="Deepgram Business Overview">
+        <Typography variant="body1" paragraph><strong>Pricing:</strong> Pay-as-you-go starting at $0.0043 per minute ($0.26/hour). Highly cost-effective at scale.</Typography>
+        <Typography variant="body1" paragraph><strong>Free Tier:</strong> New accounts receive $200 in free credit, which covers hundreds of hours of transcription to test the platform.</Typography>
+        <Typography variant="body1" paragraph><strong>Key Benefits for Clients:</strong> Deepgram is renowned for its blazing speed. It provides the lowest latency for live transcription, making it ideal for real-time captions and voice assistants. It also processes recorded files in a fraction of the audio duration.</Typography>
+        <Typography variant="body1" paragraph><strong>Best Used For:</strong> Applications where speed is the #1 priority (e.g., live call center analytics, instant voice commands, live streaming captions).</Typography>
       </ImplementationGuide>
     </Box>
   );
