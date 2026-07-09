@@ -1,4 +1,4 @@
-import { Box, Typography, Alert, Stack, Divider } from '@mui/material';
+import { Box, Typography, Alert } from '@mui/material';
 import { useWebSpeech } from './useWebSpeech';
 import MicrophoneButton from '../../shared/components/MicrophoneButton';
 import TranscriptViewer from '../../shared/components/TranscriptViewer';
@@ -19,7 +19,7 @@ export default function BrowserApiPage() {
 
   if (!isSupported) {
     return (
-      <Box p={3}>
+      <Box sx={{ p: 3 }}>
         <Alert severity="error">
           The Web Speech API is not supported in this browser. Please try Google Chrome, Microsoft Edge, or Safari.
         </Alert>
@@ -52,7 +52,7 @@ export default function BrowserApiPage() {
       {/* Header Area */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
-          <Typography variant="h4" fontWeight="bold">Browser Web Speech API</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Browser Web Speech API</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             Uses the built-in browser engine (usually handled by the OS or Google Cloud for Chrome). No API key required.
           </Typography>
@@ -92,10 +92,10 @@ export default function BrowserApiPage() {
 
       {/* Documentation Panel */}
       <ImplementationGuide title="Browser Native Business Overview">
-        <Typography variant="body1" paragraph><strong>Pricing:</strong> 100% Free.</Typography>
-        <Typography variant="body1" paragraph><strong>Free Tier:</strong> Unlimited usage, as it relies on the user's operating system or browser engine.</Typography>
-        <Typography variant="body1" paragraph><strong>Key Benefits for Clients:</strong> Requires zero backend infrastructure, no API keys, and no monthly bills. It simply leverages the voice recognition capabilities already built into Google Chrome or Apple Safari.</Typography>
-        <Typography variant="body1" paragraph><strong>Best Used For:</strong> Hobby projects, simple voice command interfaces where budget is zero, or internal tools where browser standardization (e.g., forcing everyone to use Chrome) is possible.</Typography>
+        <Typography variant="body1" sx={{ mb: 2 }}><strong>Pricing:</strong> 100% Free.</Typography>
+        <Typography variant="body1" sx={{ mb: 2 }}><strong>Free Tier:</strong> Unlimited usage, as it relies on the user's operating system or browser engine.</Typography>
+        <Typography variant="body1" sx={{ mb: 2 }}><strong>Key Benefits for Clients:</strong> Requires zero backend infrastructure, no API keys, and no monthly bills. It simply leverages the voice recognition capabilities already built into Google Chrome or Apple Safari.</Typography>
+        <Typography variant="body1" sx={{ mb: 2 }}><strong>Best Used For:</strong> Hobby projects, simple voice command interfaces where budget is zero, or internal tools where browser standardization (e.g., forcing everyone to use Chrome) is possible.</Typography>
       </ImplementationGuide>
     </Box>
   );

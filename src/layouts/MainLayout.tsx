@@ -18,10 +18,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import MicIcon from '@mui/icons-material/Mic';
 import CloudIcon from '@mui/icons-material/Cloud';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import SettingsVoiceIcon from '@mui/icons-material/SettingsVoice';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 
 const drawerWidth = 280;
 
@@ -75,11 +72,14 @@ export default function MainLayout() {
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText 
-                  primary={item.label} 
-                  primaryTypographyProps={{ 
-                    fontWeight: isActive ? 500 : 400,
-                    color: isActive ? '#fff' : 'text.secondary',
-                  }} 
+                  primary={
+                    <Typography sx={{ 
+                      fontWeight: isActive ? 500 : 400,
+                      color: isActive ? '#fff' : 'text.secondary',
+                    }}>
+                      {item.label}
+                    </Typography>
+                  } 
                 />
               </ListItemButton>
             </ListItem>

@@ -1,4 +1,4 @@
-import { Stack, Button, Tooltip } from '@mui/material';
+import { Box, Button, Tooltip } from '@mui/material';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -24,7 +24,7 @@ export default function RecordingControls({
   hasTranscript
 }: RecordingControlsProps) {
   return (
-    <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 2 }}>
+    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center', mt: 2 }}>
       {onPauseResume && isRecording && (
         <Tooltip title={isPaused ? "Resume" : "Pause"}>
           <Button
@@ -82,6 +82,6 @@ export default function RecordingControls({
           </span>
         </Tooltip>
       )}
-    </Stack>
+    </Box>
   );
 }

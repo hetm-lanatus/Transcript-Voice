@@ -17,7 +17,7 @@ export default function ImplementationGuide({ title = "Implementation Guide", ch
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <InfoIcon color="primary" />
-          <Typography fontWeight="500">{title}</Typography>
+          <Typography sx={{ fontWeight: 500 }}>{title}</Typography>
         </Box>
       </AccordionSummary>
       <AccordionDetails>
