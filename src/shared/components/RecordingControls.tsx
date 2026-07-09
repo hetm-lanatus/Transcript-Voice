@@ -10,7 +10,7 @@ interface RecordingControlsProps {
   onPauseResume?: () => void;
   onRestart?: () => void;
   onDownloadTxt?: () => void;
-  onDownloadJson?: () => void;
+
   hasTranscript: boolean;
 }
 
@@ -20,7 +20,7 @@ export default function RecordingControls({
   onPauseResume,
   onRestart,
   onDownloadTxt,
-  onDownloadJson,
+
   hasTranscript
 }: RecordingControlsProps) {
   return (
@@ -67,21 +67,7 @@ export default function RecordingControls({
         </Tooltip>
       )}
 
-      {onDownloadJson && (
-        <Tooltip title="Download as JSON">
-          <span>
-            <Button
-              variant="text"
-              color="info"
-              startIcon={<DownloadIcon />}
-              onClick={onDownloadJson}
-              disabled={!hasTranscript}
-            >
-              JSON
-            </Button>
-          </span>
-        </Tooltip>
-      )}
+
     </Box>
   );
 }

@@ -36,15 +36,7 @@ export default function BrowserApiPage() {
     element.click();
   };
 
-  const handleDownloadJson = () => {
-    const element = document.createElement("a");
-    const data = JSON.stringify({ transcript: finalTranscript, provider: 'Browser API', timestamp: new Date().toISOString() }, null, 2);
-    const file = new Blob([data], { type: 'application/json' });
-    element.href = URL.createObjectURL(file);
-    element.download = "transcript.json";
-    document.body.appendChild(element);
-    element.click();
-  };
+
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -77,7 +69,6 @@ export default function BrowserApiPage() {
           isPaused={isPaused}
           hasTranscript={!!finalTranscript}
           onDownloadTxt={handleDownloadTxt}
-          onDownloadJson={handleDownloadJson}
         />
       </Box>
 

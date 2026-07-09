@@ -42,15 +42,7 @@ export default function DeepgramPage() {
     element.click();
   };
 
-  const handleDownloadJson = () => {
-    const element = document.createElement("a");
-    const data = JSON.stringify({ transcript: finalTranscript, provider: 'Deepgram', timestamp: new Date().toISOString() }, null, 2);
-    const file = new Blob([data], { type: 'application/json' });
-    element.href = URL.createObjectURL(file);
-    element.download = "deepgram_transcript.json";
-    document.body.appendChild(element);
-    element.click();
-  };
+
 
   const getConnectionChip = () => {
     switch (connectionState) {
@@ -134,7 +126,6 @@ export default function DeepgramPage() {
           isPaused={isPaused}
           hasTranscript={!!finalTranscript}
           onDownloadTxt={handleDownloadTxt}
-          onDownloadJson={handleDownloadJson}
         />
       </Box>
 
