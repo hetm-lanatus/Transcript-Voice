@@ -86,11 +86,6 @@ export default function MainLayout() {
           );
         })}
       </List>
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
-          ADVANCED AGENTIC CODING
-        </Typography>
-      </Box>
     </Box>
   );
 
